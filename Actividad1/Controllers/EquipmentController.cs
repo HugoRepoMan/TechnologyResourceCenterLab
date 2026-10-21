@@ -1,11 +1,12 @@
-﻿using Actividad1.Models;
-using Microsoft.AspNetCore.Mvc;
 using Actividad1.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Actividad1.Controllers
 {
     public class EquipmentController : Controller
     {
+        // Usamos "static readonly" para que la lista viva en memoria durante toda la ejecución de la app.
+        // Sin "static", cada petición HTTP crearía un controlador nuevo y perderíamos los cambios hechos en Create/Edit/Delete.
         private static readonly List<Equipment> _equipmentList = new()
         {
             new Equipment { Id = 1, Name = "Latitude 5550", Category = "Computación", Brand = "Dell", DailyRate = 25.00m, Stock = 4, IsOperational = true },
@@ -30,31 +31,124 @@ namespace Actividad1.Controllers
             new Equipment { Id = 20, Name = "PowerEdge R740", Category = "Servidor", Brand = "Dell", DailyRate = 100.00m, Stock = 1, IsOperational = true }
         };
 
-        //Mostrar todos los equipos
+        // READ: Muestra el catálogo completo de equipos
         public IActionResult Index()
         {
             return View(_equipmentList);
         }
-        //Mostrar a detalle un equipo en especifico
+
+        // READ: Muestra el detalle de un equipo específico buscando por su Id
         public IActionResult Details(int id)
         {
-            // Valida que el objeto solicitado exista
             Equipment? equipment = _equipmentList.FirstOrDefault(e => e.Id == id);
             if (equipment is null)
             {
-                return NotFound(); // Retorna error 404 
+                return NotFound(); // Si alguien pone un ID que no existe en la URL, devolvemos 404
             }
             return View(equipment);
         }
-        //Muestra solo equipos disponibles para rentar 
+
+        // Vista especializada: filtra solo los equipos que funcionan y tienen stock disponible
         public IActionResult Available()
         {
-            // Se filtra usando LINQ, buscando solo los que estan operativos y tengan stock
             var availableEquipment = _equipmentList
                 .Where(e => e.IsOperational && e.Stock > 0)
                 .ToList();
 
             return View(availableEquipment);
+        }
+
+        // CREATE (GET): Muestra el formulario vacío para registrar un nuevo equipo
+        public IActionResult Create()
+        {
+            return View(new Equipment { IsOperational = true, Stock = 1, DailyRate = 15.00m });
+        }
+
+        // CREATE (POST): Recibe los datos del formulario y los guarda si pasan las validaciones
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Equipment equipment)
+        {
+            // Primero revisamos que todas las reglas (DataAnnotations) del modelo se cumplan
+            if (!ModelState.IsValid)
+            {
+                return View(equipment); // Si hay errores, regresamos al formulario mostrando los mensajes
+            }
+
+            // Calculamos el nuevo ID buscando el máximo actual + 1 para no repetir IDs si antes se borró algún registro
+            equipment.Id = _equipmentList.Any() ? _equipmentList.Max(x => x.Id) + 1 : 1;
+            _equipmentList.Add(equipment);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // UPDATE (GET): Busca el equipo por ID y carga sus datos actuales en el formulario de edición
+        public IActionResult Edit(int id)
+        {
+            Equipment? equipment = _equipmentList.FirstOrDefault(e => e.Id == id);
+            if (equipment is null)
+            {
+                return NotFound();
+            }
+            return View(equipment);
+        }
+
+        // UPDATE (POST): Guarda los cambios hechos al equipo tras validar el formulario
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Equipment updatedEquipment)
+        {
+            if (id != updatedEquipment.Id)
+            {
+                return NotFound();
+            }
+
+            Equipment? existing = _equipmentList.FirstOrDefault(e => e.Id == id);
+            if (existing is null)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(updatedEquipment);
+            }
+
+            // Actualizamos las propiedades del objeto que ya está en nuestra lista estática
+            existing.Name = updatedEquipment.Name;
+            existing.Category = updatedEquipment.Category;
+            existing.Brand = updatedEquipment.Brand;
+            existing.DailyRate = updatedEquipment.DailyRate;
+            existing.Stock = updatedEquipment.Stock;
+            existing.IsOperational = updatedEquipment.IsOperational;
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // DELETE (GET): Muestra una pantalla de confirmación antes de borrar definitivamente
+        public IActionResult Delete(int id)
+        {
+            Equipment? equipment = _equipmentList.FirstOrDefault(e => e.Id == id);
+            if (equipment is null)
+            {
+                return NotFound();
+            }
+            return View(equipment);
+        }
+
+        // DELETE (POST): Ejecuta el borrado real cuando el usuario confirma en pantalla
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            Equipment? equipment = _equipmentList.FirstOrDefault(e => e.Id == id);
+            if (equipment is null)
+            {
+                return NotFound();
+            }
+
+            _equipmentList.Remove(equipment);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

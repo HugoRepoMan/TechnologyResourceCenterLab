@@ -1,41 +1,69 @@
-﻿@model IEnumerable<Actividad1.Models.Equipment>
+@model IEnumerable<Actividad1.Models.Equipment>
 
 @{
-    ViewData["Title"] = "Equipment Catalog";
+    ViewData["Title"] = "Catálogo de Equipos";
 }
 
 <div class="container mt-5">
     <h1 class="stamped-heading text-center">E Q U I P M E N T</h1>
 
+    @* Barra de herramientas superior para crear un nuevo equipo o filtrar disponibles *@
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <p class="mb-0" style="color: var(--color-steel);">
+            <i class="bi bi-pc-display me-1"></i> Total registrados: <strong>@Model.Count()</strong> equipos
+        </p>
+        <div class="d-flex gap-2">
+            <a asp-action="Available" class="btn btn-dope-outline">
+                <i class="bi bi-check2-circle me-1"></i> Ver Disponibles
+            </a>
+            <a asp-action="Create" class="btn btn-dope-violet">
+                <i class="bi bi-plus-lg me-1"></i> Nuevo Equipo
+            </a>
+        </div>
+    </div>
+
     <div class="row g-4">
         @foreach (var item in Model)
         {
+            // Asignamos el color del badge según el texto que devuelve el método de negocio GetStatus()
             string badgeColor = item.GetStatus() switch
             {
-                "AVAILABLE" => "bg-success",
-                "LAST UNIT" => "bg-warning text-dark",
-                "NOT AVAILABLE" => "bg-danger",
-                "OUT OF SERVICE" => "bg-dark border border-secondary",
+                "Disponible" or "AVAILABLE" => "bg-success",
+                "Ultima unidad" or "LAST UNIT" => "bg-warning text-dark",
+                "No valido" or "NOT AVAILABLE" => "bg-danger",
+                "Fuera de servicio" or "OUT OF SERVICE" => "bg-dark border border-secondary",
                 _ => "bg-secondary"
             };
 
             <div class="col-md-6 col-lg-4">
-                <div class="dope-card h-100 d-flex flex-column">
-                    <h4 class="mb-1">@item.Name</h4>
-                    <p class="text-muted mb-3" style="color: var(--color-steel) !important;">@item.Brand | @item.Category</p>
+                <div class="content-card dope-card h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <h4 class="mb-0">@item.Name</h4>
+                        <span class="badge bg-dark border border-secondary">#@item.Id</span>
+                    </div>
+                    <p class="text-muted mb-3" style="color: var(--color-steel) !important;">
+                        <i class="bi bi-tag me-1"></i>@item.Brand | @item.Category
+                    </p>
 
                     <ul class="list-unstyled mb-4">
-                        <li><strong>Daily Rate:</strong> $@item.DailyRate.ToString("F2")</li>
-                        <li><strong>Stock:</strong> @item.Stock units</li>
+                        <li><i class="bi bi-cash-coin me-2" style="color: var(--color-signal-violet);"></i><strong>Tarifa Diaria:</strong> $@item.DailyRate.ToString("F2")</li>
+                        <li><i class="bi bi-boxes me-2" style="color: var(--color-signal-violet);"></i><strong>Stock:</strong> @item.Stock unidades</li>
                         <li class="mt-2">
-                            <strong>Status:</strong>
+                            <strong>Estado:</strong>
                             <span class="badge rounded-pill @badgeColor">@item.GetStatus()</span>
                         </li>
                     </ul>
 
-                    <div class="mt-auto">
-                        <a asp-controller="Equipment" asp-action="Details" asp-route-id="@item.Id" class="btn btn-dope-outline w-100 text-center">
-                            View Details
+                    @* Botones de acción CRUD (Detalles, Editar, Eliminar) *@
+                    <div class="mt-auto d-flex gap-2">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-dope-outline flex-grow-1 text-center">
+                            <i class="bi bi-eye me-1"></i> Detalles
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-dope-outline" title="Editar">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                            <i class="bi bi-trash3"></i>
                         </a>
                     </div>
                 </div>

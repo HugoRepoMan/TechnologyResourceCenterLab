@@ -1,12 +1,11 @@
-﻿using Actividad1.Models;
-using Microsoft.AspNetCore.Mvc;
 using Actividad1.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TechnologyResourceCenter.Controllers
 {
     public class KitsController : Controller
     {
-        // Lista estática con los 10 Kits requeridos
+        // Lista estática y readonly para conservar en memoria las altas, bajas y cambios de los Kits
         private static readonly List<Kit> _kitsList = new()
         {
             new Kit { Id = 1, Name = "Kit de Inicio Arduino", Category = "Electrónica", Level = "PRINCIPIANTE", DailyRate = 8.00m, Quantity = 15, IsOperational = true },
@@ -21,13 +20,13 @@ namespace TechnologyResourceCenter.Controllers
             new Kit { Id = 10, Name = "Kit de Realidad Virtual", Category = "RV", Level = "AVANZADO", DailyRate = 40.00m, Quantity = 1, IsOperational = true }
         };
 
-        //Mostrar todos los kits
+        // READ: Muestra todos los kits tecnológicos
         public IActionResult Index()
         {
             return View(_kitsList);
         }
 
-        //Mostrar detalle de un kit específico
+        // READ: Muestra el detalle completo de un kit específico
         public IActionResult Details(int id)
         {
             Kit? kit = _kitsList.FirstOrDefault(k => k.Id == id);
@@ -38,12 +37,101 @@ namespace TechnologyResourceCenter.Controllers
             return View(kit);
         }
 
-        //Agrupar por nivel
+        // Vista especializada: ordena y agrupa los kits según su nivel de dificultad
         public IActionResult ByLevel()
         {
-            //Ordenar la lista por nivel alfabéticamente 
             var kitsOrderedByLevel = _kitsList.OrderBy(k => k.Level).ToList();
             return View(kitsOrderedByLevel);
+        }
+
+        // CREATE (GET): Muestra el formulario para dar de alta un nuevo kit
+        public IActionResult Create()
+        {
+            return View(new Kit { Level = "PRINCIPIANTE", IsOperational = true, Quantity = 5, DailyRate = 10.00m });
+        }
+
+        // CREATE (POST): Verifica ModelState.IsValid y guarda el nuevo kit con un ID seguro
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Kit kit)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(kit);
+            }
+
+            kit.Id = _kitsList.Any() ? _kitsList.Max(x => x.Id) + 1 : 1;
+            _kitsList.Add(kit);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // UPDATE (GET): Busca el kit a editar y lo envía a la vista
+        public IActionResult Edit(int id)
+        {
+            Kit? kit = _kitsList.FirstOrDefault(k => k.Id == id);
+            if (kit is null)
+            {
+                return NotFound();
+            }
+            return View(kit);
+        }
+
+        // UPDATE (POST): Valida y actualiza los datos del kit seleccionado
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Kit updatedKit)
+        {
+            if (id != updatedKit.Id)
+            {
+                return NotFound();
+            }
+
+            Kit? existing = _kitsList.FirstOrDefault(k => k.Id == id);
+            if (existing is null)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(updatedKit);
+            }
+
+            existing.Name = updatedKit.Name;
+            existing.Category = updatedKit.Category;
+            existing.Level = updatedKit.Level;
+            existing.DailyRate = updatedKit.DailyRate;
+            existing.Quantity = updatedKit.Quantity;
+            existing.IsOperational = updatedKit.IsOperational;
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // DELETE (GET): Muestra la pantalla de confirmación antes de eliminar el kit
+        public IActionResult Delete(int id)
+        {
+            Kit? kit = _kitsList.FirstOrDefault(k => k.Id == id);
+            if (kit is null)
+            {
+                return NotFound();
+            }
+            return View(kit);
+        }
+
+        // DELETE (POST): Remueve el kit de la lista tras confirmar la acción
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            Kit? kit = _kitsList.FirstOrDefault(k => k.Id == id);
+            if (kit is null)
+            {
+                return NotFound();
+            }
+
+            _kitsList.Remove(kit);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

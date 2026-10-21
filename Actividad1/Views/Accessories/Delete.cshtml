@@ -1,0 +1,44 @@
+@model Actividad1.Models.Accessory
+
+@{
+    ViewData["Title"] = "Eliminar Accesorio";
+}
+
+<div class="container mt-5">
+    <h1 class="stamped-heading text-center text-danger">D E L E T E</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="content-card dope-card p-4 p-md-5 border-danger">
+                <div class="d-flex align-items-center mb-3 text-danger">
+                    <i class="bi bi-exclamation-triangle-fill fs-2 me-3"></i>
+                    <div>
+                        <h3 class="mb-0">¿Confirmas la eliminación de este accesorio?</h3>
+                        <small style="color: var(--color-steel);">El registro se eliminará permanentemente de la lista en memoria.</small>
+                    </div>
+                </div>
+                <hr style="border-color: rgba(247,249,250,0.2);" />
+
+                <div class="p-3 mb-4 rounded" style="background-color: rgba(220, 53, 69, 0.08);">
+                    <h4 class="mb-2">@Model.Name</h4>
+                    <p class="mb-1"><strong>ID:</strong> #@Model.Id</p>
+                    <p class="mb-1"><strong>Marca / Categoría:</strong> @Model.Brand | @Model.Category</p>
+                    <p class="mb-1"><strong>Precio Unitario:</strong> $@Model.Price.ToString("F2")</p>
+                    <p class="mb-0"><strong>Stock:</strong> @Model.Quantity unidades (@Model.GetInventoryStatus())</p>
+                </div>
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash3-fill me-1"></i> Sí, Eliminar Accesorio
+                        </button>
+                        <a asp-action="Index" class="btn btn-dope-outline">
+                            <i class="bi bi-arrow-left me-1"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

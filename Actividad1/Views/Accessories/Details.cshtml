@@ -1,7 +1,7 @@
-﻿@model Actividad1.Models.Accessory
+@model Actividad1.Models.Accessory
 
 @{
-    ViewData["Title"] = "Accessory Details";
+    ViewData["Title"] = "Detalle del Accesorio";
     string inventoryColor = Model.GetInventoryStatus() == "IN STOCK" ? "bg-success" : (Model.GetInventoryStatus() == "LOW STOCK" ? "bg-warning text-dark" : "bg-danger");
 }
 
@@ -10,37 +10,50 @@
 
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="dope-card p-5" style="border-color: rgba(247,249,250,0.2);">
-                <h2>@Model.Name</h2>
+            <div class="content-card dope-card p-5" style="border-color: rgba(247,249,250,0.2);">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2><i class="bi bi-headphones me-2" style="color: var(--color-signal-violet);"></i>@Model.Name</h2>
+                    <span class="badge bg-dark border border-secondary">ID #@Model.Id</span>
+                </div>
                 <hr style="border-color: rgba(247,249,250,0.2);" />
 
                 <div class="row mb-4">
                     <div class="col-sm-6">
-                        <p><strong>Brand:</strong> @Model.Brand</p>
-                        <p><strong>Category:</strong> @Model.Category</p>
-                        <p><strong>Current Stock:</strong> @Model.Quantity units</p>
+                        <p><strong>Marca:</strong> @Model.Brand</p>
+                        <p><strong>Categoría:</strong> @Model.Category</p>
+                        <p><strong>Stock Actual:</strong> @Model.Quantity unidades</p>
                     </div>
                     <div class="col-sm-6">
-                        <p><strong>Unit Price:</strong> $@Model.Price.ToString("F2")</p>
-                        <p><strong>Availability:</strong> <span class="badge @inventoryColor">@Model.GetInventoryStatus()</span></p>
+                        <p><strong>Precio Unitario:</strong> $@Model.Price.ToString("F2")</p>
+                        <p><strong>Disponibilidad:</strong> <span class="badge @inventoryColor">@Model.GetInventoryStatus()</span></p>
                     </div>
                 </div>
                 <div class="p-3 mb-4 rounded" style="background-color: rgba(247,249,250,0.05);">
-                    <h5 style="color: var(--color-almost-white);">Bulk Pricing Estimation</h5>
+                    <h5 style="color: var(--color-almost-white);"><i class="bi bi-calculator me-2"></i>Estimación de Compra por Lote</h5>
                     <ul class="list-unstyled mb-0" style="color: var(--color-steel);">
-                        <li>1 unit: $@Model.CalculateBulkCost(1).ToString("F2")</li>
-                        <li>5 units: $@Model.CalculateBulkCost(5).ToString("F2")</li>
-                        <li>10 units: $@Model.CalculateBulkCost(10).ToString("F2")</li>
+                        <li>1 unidad: <strong>$@Model.CalculateBulkCost(1).ToString("F2")</strong></li>
+                        <li>5 unidades: <strong>$@Model.CalculateBulkCost(5).ToString("F2")</strong></li>
+                        <li>10 unidades: <strong>$@Model.CalculateBulkCost(10).ToString("F2")</strong></li>
                         @if (Model.Quantity < 10)
                         {
-                            <li class="mt-2 text-danger" style="font-size: 12px;">* Not enough stock for 10 units.</li>
+                            <li class="mt-2 text-danger" style="font-size: 12px;">* No hay suficiente stock para cubrir un pedido de 10 unidades (retorna $0.00).</li>
                         }
                     </ul>
                 </div>
 
-                <div class="d-flex gap-3 mt-4">
-                    <a asp-action="Index" class="btn btn-dope-outline">Back to Accessories</a>
-                    <a asp-action="ByCategory" class="btn btn-dope-outline" style="border-color: var(--color-signal-violet); color: var(--color-signal-violet);">View by Category</a>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a asp-action="Index" class="btn btn-dope-outline">
+                        <i class="bi bi-arrow-left me-1"></i> Volver a Accesorios
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-dope-violet">
+                        <i class="bi bi-pencil-square me-1"></i> Editar
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
+                        <i class="bi bi-trash3 me-1"></i> Eliminar
+                    </a>
+                    <a asp-action="ByCategory" class="btn btn-dope-outline ms-auto" style="border-color: var(--color-signal-violet); color: var(--color-signal-violet);">
+                        <i class="bi bi-grid me-1"></i> Ver por Categoría
+                    </a>
                 </div>
             </div>
         </div>

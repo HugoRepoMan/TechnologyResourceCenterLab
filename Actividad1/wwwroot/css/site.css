@@ -27,9 +27,10 @@ body {
     margin-bottom: 40px;
 }
 
-/* Tarjetas sin sombras, solo bordes finos */
-.dope-card {
-    background-color: transparent;
+/* Tarjetas sin sombras, solo bordes finos (soporta dope-card y content-card) */
+.dope-card,
+.content-card {
+    background-color: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(247, 249, 250, 0.2); /* Hairline divider */
     border-radius: var(--radius-cards);
     padding: 20px;
@@ -57,7 +58,39 @@ body {
     color: white;
     border: none;
     border-radius: var(--radius-buttons);
+    padding: 10px 16px;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
 }
+
+    .btn-dope-violet:hover {
+        opacity: 0.9;
+        color: white;
+    }
+
+/* Controles de formulario adaptados al tema oscuro */
+.form-control,
+.form-select {
+    background-color: #141418;
+    border: 1px solid rgba(247, 249, 250, 0.25);
+    color: var(--color-almost-white);
+    border-radius: var(--radius-buttons);
+}
+
+    .form-control:focus,
+    .form-select:focus {
+        background-color: #1a1a22;
+        border-color: var(--color-signal-violet);
+        color: var(--color-almost-white);
+        box-shadow: 0 0 0 0.2rem rgba(175, 80, 255, 0.25);
+    }
+
+.form-label {
+    color: var(--color-soft-white);
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
 /* EFECTO FROSTED NAV BAR */
 .frosted-nav {
     background-color: rgba(51, 50, 72, 0.7);

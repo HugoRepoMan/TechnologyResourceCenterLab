@@ -1,11 +1,11 @@
-﻿using Actividad1.Models;
-using Microsoft.AspNetCore.Mvc;
 using Actividad1.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TechnologyResourceCenter.Controllers
 {
     public class AccessoriesController : Controller
     {
+        // Lista estática y de solo lectura para persistir los accesorios en memoria mientras corre la aplicación
         private static readonly List<Accessory> _accessoriesList = new()
         {
             new Accessory { Id = 1, Name = "Wireless Microphone", Brand = "Rode", Category = "Audio", Price = 250.00m, Quantity = 8 },
@@ -25,13 +25,13 @@ namespace TechnologyResourceCenter.Controllers
             new Accessory { Id = 15, Name = "Studio Monitor Speakers", Brand = "Yamaha", Category = "Audio", Price = 300.00m, Quantity = 2 }
         };
 
-        //Mostrar todos los accesorios
+        // READ: Muestra el listado general de accesorios
         public IActionResult Index()
         {
             return View(_accessoriesList);
         }
 
-        // Mostrar detalle de un accesorio
+        // READ: Muestra el detalle de un accesorio específico validando que el ID exista
         public IActionResult Details(int id)
         {
             Accessory? accessory = _accessoriesList.FirstOrDefault(a => a.Id == id);
@@ -42,12 +42,100 @@ namespace TechnologyResourceCenter.Controllers
             return View(accessory);
         }
 
-        //Agrupar por Categoría
+        // Vista especializada: organiza los accesorios alfabéticamente por su categoría
         public IActionResult ByCategory()
         {
-            //Ordena alfabeticamente 
             var accessoriesByCategory = _accessoriesList.OrderBy(a => a.Category).ToList();
             return View(accessoriesByCategory);
+        }
+
+        // CREATE (GET): Muestra el formulario para registrar un nuevo accesorio
+        public IActionResult Create()
+        {
+            return View(new Accessory { Quantity = 10, Price = 25.00m });
+        }
+
+        // CREATE (POST): Valida el modelo y agrega el nuevo accesorio calculando un ID libre de colisiones
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Accessory accessory)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(accessory);
+            }
+
+            accessory.Id = _accessoriesList.Any() ? _accessoriesList.Max(x => x.Id) + 1 : 1;
+            _accessoriesList.Add(accessory);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // UPDATE (GET): Busca el accesorio por ID para cargarlo en la vista de edición
+        public IActionResult Edit(int id)
+        {
+            Accessory? accessory = _accessoriesList.FirstOrDefault(a => a.Id == id);
+            if (accessory is null)
+            {
+                return NotFound();
+            }
+            return View(accessory);
+        }
+
+        // UPDATE (POST): Guarda los cambios realizados al accesorio si el formulario es válido
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Accessory updatedAccessory)
+        {
+            if (id != updatedAccessory.Id)
+            {
+                return NotFound();
+            }
+
+            Accessory? existing = _accessoriesList.FirstOrDefault(a => a.Id == id);
+            if (existing is null)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(updatedAccessory);
+            }
+
+            existing.Name = updatedAccessory.Name;
+            existing.Brand = updatedAccessory.Brand;
+            existing.Category = updatedAccessory.Category;
+            existing.Price = updatedAccessory.Price;
+            existing.Quantity = updatedAccessory.Quantity;
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // DELETE (GET): Muestra la confirmación previa a eliminar el accesorio
+        public IActionResult Delete(int id)
+        {
+            Accessory? accessory = _accessoriesList.FirstOrDefault(a => a.Id == id);
+            if (accessory is null)
+            {
+                return NotFound();
+            }
+            return View(accessory);
+        }
+
+        // DELETE (POST): Elimina el accesorio definitivamente de la lista en memoria
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            Accessory? accessory = _accessoriesList.FirstOrDefault(a => a.Id == id);
+            if (accessory is null)
+            {
+                return NotFound();
+            }
+
+            _accessoriesList.Remove(accessory);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

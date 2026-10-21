@@ -1,0 +1,60 @@
+@model Actividad1.Models.Space
+
+@{
+    ViewData["Title"] = "Detalle del Espacio";
+    string badgeColor = Model.IsAvailable ? "bg-success" : "bg-danger";
+}
+
+<div class="container mt-5">
+    <h1 class="stamped-heading text-center">D E T A I L S</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="content-card dope-card p-5" style="border-color: var(--color-signal-violet);">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2><i class="bi bi-building me-2" style="color: var(--color-signal-violet);"></i>@Model.Name</h2>
+                    <span class="badge bg-dark border border-secondary">ID #@Model.Id</span>
+                </div>
+                <hr style="border-color: rgba(247,249,250,0.2);" />
+
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <p><strong>Ubicación:</strong> @Model.Location</p>
+                        <p><strong>Capacidad Máxima:</strong> @Model.Capacity personas</p>
+                        <p><strong>Clasificación:</strong> @Model.GetCapacityType()</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>Tarifa por Hora:</strong> $@Model.HourlyRate.ToString("F2")</p>
+                        <p><strong>Estado:</strong> <span class="badge @badgeColor">@Model.GetAvailabilityStatus()</span></p>
+                        <p><strong>Habilitado:</strong> @(Model.IsAvailable ? "Disponible para reserva" : "Ocupado / En mantenimiento")</p>
+                    </div>
+                </div>
+
+                @* Cálculo de costos por bloques horarios usando el método del modelo *@
+                <div class="p-3 mb-4 rounded" style="background-color: rgba(247,249,250,0.05);">
+                    <h5 style="color: var(--color-signal-violet);"><i class="bi bi-calculator me-2"></i>Costo Estimado de Reserva</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li>2 horas: <strong>$@Model.CalculateEstimatedCost(2).ToString("F2")</strong></li>
+                        <li>4 horas (Media jornada): <strong>$@Model.CalculateEstimatedCost(4).ToString("F2")</strong></li>
+                        <li>8 horas (Jornada completa): <strong>$@Model.CalculateEstimatedCost(8).ToString("F2")</strong></li>
+                    </ul>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a asp-action="Index" class="btn btn-dope-outline">
+                        <i class="bi bi-arrow-left me-1"></i> Volver a Espacios
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-dope-violet">
+                        <i class="bi bi-pencil-square me-1"></i> Editar
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
+                        <i class="bi bi-trash3 me-1"></i> Eliminar
+                    </a>
+                    <a asp-action="Available" class="btn btn-dope-outline ms-auto">
+                        <i class="bi bi-door-open me-1"></i> Ver Disponibles
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

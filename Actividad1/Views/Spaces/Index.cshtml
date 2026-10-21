@@ -1,34 +1,60 @@
-﻿@model IEnumerable<Actividad1.Models.Space>
+@model IEnumerable<Actividad1.Models.Space>
 
 @{
-    ViewData["Title"] = "Technology Spaces";
+    ViewData["Title"] = "Espacios Tecnológicos";
 }
 
 <div class="container mt-5">
     <h1 class="stamped-heading text-center">S P A C E S</h1>
 
+    @* Barra de navegación y acciones rápidas del módulo Spaces *@
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <p class="mb-0" style="color: var(--color-steel);">
+            <i class="bi bi-building me-1"></i> Total registrados: <strong>@Model.Count()</strong> espacios
+        </p>
+        <div class="d-flex gap-2">
+            <a asp-action="Available" class="btn btn-dope-outline">
+                <i class="bi bi-door-open me-1"></i> Espacios Disponibles
+            </a>
+            <a asp-action="Create" class="btn btn-dope-violet">
+                <i class="bi bi-plus-lg me-1"></i> Nuevo Espacio
+            </a>
+        </div>
+    </div>
+
     <div class="row g-4">
         @foreach (var space in Model)
         {
-            string badgeColor = space.GetAvailabilityStatus() == "AVAILABLE" ? "bg-success" : "bg-danger";
+            string badgeColor = space.IsAvailable ? "bg-success" : "bg-danger";
 
             <div class="col-md-6">
-                <div class="dope-card h-100 d-flex flex-column">
-                    <h3 class="mb-1">@space.Name</h3>
-                    <p class="mb-3" style="color: var(--color-steel);">@space.Location</p>
+                <div class="content-card dope-card h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <h3 class="mb-0">@space.Name</h3>
+                        <span class="badge bg-dark border border-secondary">#@space.Id</span>
+                    </div>
+                    <p class="mb-3" style="color: var(--color-steel);">
+                        <i class="bi bi-geo-alt me-1"></i>@space.Location
+                    </p>
 
                     <ul class="list-unstyled mb-4">
-                        <li><strong>Capacity:</strong> @space.Capacity people</li>
-                        <li><strong>Hourly Rate:</strong> $@space.HourlyRate.ToString("F2") / hour</li>
+                        <li><i class="bi bi-people me-2" style="color: var(--color-signal-violet);"></i><strong>Capacidad:</strong> @space.Capacity personas (@space.GetCapacityType())</li>
+                        <li><i class="bi bi-clock-history me-2" style="color: var(--color-signal-violet);"></i><strong>Tarifa por Hora:</strong> $@space.HourlyRate.ToString("F2") / hora</li>
                         <li class="mt-2">
-                            <strong>Status:</strong>
+                            <strong>Estado:</strong>
                             <span class="badge rounded-pill @badgeColor">@space.GetAvailabilityStatus()</span>
                         </li>
                     </ul>
 
-                    <div class="mt-auto">
-                        <a asp-controller="Spaces" asp-action="Details" asp-route-id="@space.Id" class="btn btn-dope-outline w-100 text-center">
-                            View Room Details
+                    <div class="mt-auto d-flex gap-2">
+                        <a asp-controller="Spaces" asp-action="Details" asp-route-id="@space.Id" class="btn btn-sm btn-dope-outline flex-grow-1 text-center">
+                            <i class="bi bi-eye me-1"></i> Ver Detalles
+                        </a>
+                        <a asp-controller="Spaces" asp-action="Edit" asp-route-id="@space.Id" class="btn btn-sm btn-dope-outline" title="Editar">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a asp-controller="Spaces" asp-action="Delete" asp-route-id="@space.Id" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                            <i class="bi bi-trash3"></i>
                         </a>
                     </div>
                 </div>

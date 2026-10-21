@@ -1,0 +1,41 @@
+@model IEnumerable<Actividad1.Models.Space>
+
+@{
+    ViewData["Title"] = "Espacios Disponibles";
+}
+
+<div class="container mt-5">
+    <h1 class="stamped-heading text-center" style="color: var(--color-signal-violet);">A V A I L A B L E</h1>
+    <p class="text-center mb-5" style="color: var(--color-steel);">
+        <i class="bi bi-check-circle-fill text-success me-1"></i> Mostrando únicamente las salas y laboratorios habilitados para reserva inmediata.
+    </p>
+
+    <div class="row g-4">
+        @foreach (var space in Model)
+        {
+            <div class="col-md-4">
+                <div class="content-card dope-card text-center h-100 d-flex flex-column">
+                    <h5>@space.Name</h5>
+                    <p style="color: var(--color-steel);"><i class="bi bi-geo-alt me-1"></i>@space.Location</p>
+                    <h3 class="mb-2">$@space.HourlyRate.ToString("F2")<span style="font-size: 14px; color: var(--color-steel);">/hora</span></h3>
+                    <p class="small mb-2" style="color: var(--color-steel);">Aforo: @space.Capacity personas (@space.GetCapacityType())</p>
+                    <div class="mb-3">
+                        <span class="badge bg-success">@space.GetAvailabilityStatus()</span>
+                    </div>
+
+                    <div class="mt-auto">
+                        <a asp-action="Details" asp-route-id="@space.Id" class="btn btn-dope-outline w-100">
+                            <i class="bi bi-calendar2-check me-1"></i> Ver Detalles de Sala
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="text-center mt-5">
+        <a asp-action="Index" class="btn btn-dope-outline">
+            <i class="bi bi-arrow-left me-1"></i> Ver Todos los Espacios
+        </a>
+    </div>
+</div>

@@ -1,7 +1,7 @@
-﻿@model IEnumerable<Actividad1.Models.Accessory>
+@model IEnumerable<Actividad1.Models.Accessory>
 
 @{
-    ViewData["Title"] = "Accessories By Category";
+    ViewData["Title"] = "Accesorios por Categoría";
     var accessoriesByCategory = Model.GroupBy(a => a.Category);
 }
 
@@ -18,17 +18,25 @@
             @foreach (var accessory in group)
             {
                 <div class="col-md-3">
-                    <div class="dope-card h-100">
+                    <div class="content-card dope-card h-100 d-flex flex-column">
                         <h6 class="mb-1">@accessory.Name</h6>
                         <p class="mb-3" style="color: var(--color-steel); font-size: 12px;">@accessory.Brand</p>
 
                         <div class="d-flex justify-content-between align-items-center mt-auto">
                             <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px;">$@accessory.Price.ToString("F2")</span>
-                            <a asp-action="Details" asp-route-id="@accessory.Id" class="btn btn-sm btn-dope-outline" style="padding: 2px 10px; font-size: 12px;">View</a>
+                            <a asp-action="Details" asp-route-id="@accessory.Id" class="btn btn-sm btn-dope-outline" style="padding: 2px 10px; font-size: 12px;">
+                                <i class="bi bi-eye me-1"></i> Ver
+                            </a>
                         </div>
                     </div>
                 </div>
             }
         </div>
     }
+
+    <div class="text-center mt-4">
+        <a asp-action="Index" class="btn btn-dope-outline">
+            <i class="bi bi-arrow-left me-1"></i> Volver al Catálogo de Accesorios
+        </a>
+    </div>
 </div>

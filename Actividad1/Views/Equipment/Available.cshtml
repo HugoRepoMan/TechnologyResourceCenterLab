@@ -1,32 +1,40 @@
-﻿@model IEnumerable<Actividad1.Models.Equipment>
+@model IEnumerable<Actividad1.Models.Equipment>
 
 @{
-    ViewData["Title"] = "Available Equipment";
+    ViewData["Title"] = "Equipos Disponibles";
 }
 
 <div class="container mt-5">
     <h1 class="stamped-heading text-center" style="color: var(--color-signal-violet);">A V A I L A B L E</h1>
-    <p class="text-center mb-5" style="color: var(--color-steel);">Showing only operational equipment currently in stock.</p>
+    <p class="text-center mb-5" style="color: var(--color-steel);">
+        <i class="bi bi-check-circle-fill text-success me-1"></i> Mostrando únicamente los equipos operativos y con stock disponible para préstamo inmediato.
+    </p>
 
     <div class="row g-4">
         @foreach (var item in Model)
         {
             <div class="col-md-4">
-                <div class="dope-card text-center">
+                <div class="content-card dope-card text-center h-100 d-flex flex-column">
                     <h5>@item.Name</h5>
-                    <p style="color: var(--color-steel);">@item.Brand</p>
-                    <h3 class="mb-3">$@item.DailyRate.ToString("F2")<span style="font-size: 14px; color: var(--color-steel);">/day</span></h3>
-                    <span class="badge bg-success mb-3">@item.GetStatus()</span>
+                    <p style="color: var(--color-steel);">@item.Brand | @item.Category</p>
+                    <h3 class="mb-3">$@item.DailyRate.ToString("F2")<span style="font-size: 14px; color: var(--color-steel);">/día</span></h3>
+                    <div class="mb-3">
+                        <span class="badge bg-success">@item.GetStatus() (@item.Stock uds.)</span>
+                    </div>
 
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-dope-outline w-100">
-                        Book Now
-                    </a>
+                    <div class="mt-auto">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-dope-outline w-100">
+                            <i class="bi bi-calendar-check me-1"></i> Ver Detalles
+                        </a>
+                    </div>
                 </div>
             </div>
         }
     </div>
 
     <div class="text-center mt-5">
-        <a asp-action="Index" class="btn btn-dope-outline">View Full Catalog</a>
+        <a asp-action="Index" class="btn btn-dope-outline">
+            <i class="bi bi-arrow-left me-1"></i> Ver Catálogo Completo
+        </a>
     </div>
 </div>
